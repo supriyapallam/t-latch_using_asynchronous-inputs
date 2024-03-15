@@ -1,0 +1,64 @@
+//Design Code
+module T_latch(output reg q,output wire qbar,input clk,t,pre,clr);
+  
+  reg q1;
+  always@(clk)
+    begin
+      if(clk==1'b1)
+        begin
+          q1 = t;
+        end
+      else
+        begin
+          q1 = q;
+        end
+    end
+  assign q = pre ? 1'b1 : (clr ? 1'b0 : q1);
+  
+  assign qbar = ~q;
+  
+endmodule
+
+//Test Bench Code
+module tb();
+  reg clk,t,pre,clr;
+  wire q,qbar;
+  T_latch DUT(q,qbar,clk,t,pre,clr);
+  
+  initial
+    begin
+     clk = 1'b0;
+      forever #5 clk = ~clk;
+    end
+  
+  initial
+    begin
+      pre = 1'b1;
+      #10;
+      pre = 1'b0;
+     
+      clr = 1'b0;
+      #10;
+      clr = 1'b1;
+      #10;
+      t = 1'b0;
+      #10;
+      t = 1'b1;
+      #10;
+      $finish;
+    end
+  
+  initial
+    begin
+      $dumpfile("test.vcd");
+      $dumpvars(1);
+    end
+  
+  initial
+    begin
+      $timeformat(-9,0,"ns",10);
+      
+      $monitor("time=%0t, clk=%0b, t=%0b, q=%0b, qbar=%0b",$time,clk,t,q,qbar);
+    end
+  
+endmodule
